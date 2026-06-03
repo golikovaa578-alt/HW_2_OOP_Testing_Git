@@ -33,7 +33,10 @@ class Recipe:
     @staticmethod
     def is_valid_ratio(a):
         return isinstance(a, (int, float)) and a > 0
+
     def scale(self, a: float):
+        if not Recipe.is_valid_ratio(a):
+            raise ValueError("Количество должно быть положительным")
         b = Recipe(self.title)
         for i in self.ingredients:
             c = Ingredient(i.name, i.quantity * a, i.unit)
@@ -78,8 +81,14 @@ class DietaryRecipe(Recipe):
     def __init__(self, a: str, b: str, c: list = None):
         super().__init__(a, c)
         self.diet_type = b
+
     def scale(self, a: float):
-        b = super().scale(a)
-        return DietaryRecipe(self.title, self.diet_type, b.ingredients)
+        if not Recipe.is_valid_ratio(a):
+            raise ValueError("Количество должно быть положительным")
+        b = Recipe(self.title)
+        for i in self.ingredients:
+            c = Ingredient(i.name, i.quantity * a, i.unit)
+            b.ingredients.append(c)
+        return b
     def __str__(self):
         return f"[{self.diet_type}] {super().__str__()}"
